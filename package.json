@@ -1,0 +1,19 @@
+{
+    "name": "typedrpc",
+    "version": "0.0.1",
+    "description": "Typed RPC",
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js",
+    "types": "./dist/esm/index.d.ts",
+    "scripts": {
+        "build": "tsc; tsc --module commonjs --outDir dist/cjs"
+    },
+    "author": "Roman Kirsanov",
+    "devDependencies": {
+        "@types/node": "16.11.6",
+        "typescript": "4.5.5"
+    },
+    "dependencies": {
+        "schema": "file:../schema"
+    }
+}

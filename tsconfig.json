@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "module": "es6",
+        "target": "es6",
+        "outDir": "./dist/esm",
+		"declaration": true,
+        "lib": ["es2017", "es5", "DOM"]
+    },
+	"include": [
+		"src"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}

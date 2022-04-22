@@ -1,0 +1,81 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import * as libschema from 'schema';
+export const EndpointSchema = {
+    type: 'object',
+    props: {
+        name: { type: 'string' },
+        method: { type: 'function' },
+        schemaIn: { type: 'object' },
+        schemaOut: { type: 'object' }
+    }
+};
+export const createServer = () => {
+    const _endpoints = [];
+    const bind = (name, method, schemaIn, schemaOut) => {
+        _endpoints.push({ name, method, schemaIn, schemaOut });
+    };
+    const call = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+        libschema.assert(payload, { type: 'any' });
+        const __CallSchema = {
+            type: 'object',
+            props: {
+                method: { type: 'string' },
+                options: { type: 'object' }
+            }
+        };
+        const json = (() => {
+            try {
+                return JSON.parse(payload);
+            }
+            catch (e) {
+                throw new Error(`failed to serialize RPC message: ${e.message}`);
+            }
+        })();
+        const callobj = libschema.assert(json, __CallSchema);
+        const endpoint = _endpoints.find(({ name }) => name === callobj.method);
+        if (endpoint) {
+            try {
+                return libschema.assert(yield endpoint.method(libschema.assert(callobj.options, endpoint.schemaIn)), endpoint.schemaOut);
+            }
+            catch (e) {
+                throw new Error(`failed to execute method "${callobj.method}": ${e.message}`);
+            }
+        }
+        else {
+            throw new Error(`method not found "${callobj.method}"`);
+        }
+    });
+    return { bind, call };
+};
+export const ClientOptionsSchema = {
+    type: 'object',
+    props: {
+        url: { type: 'string', optional: true }
+    },
+    optional: true
+};
+export const createClient = (options_) => {
+    libschema.assert(options_, ClientOptionsSchema);
+    const call = (method, options) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        const res = yield fetch(((_a = options_ === null || options_ === void 0 ? void 0 : options_.url) !== null && _a !== void 0 ? _a : '/api'), { method: 'POST', body: JSON.stringify({ method, options }) });
+        if (res.status === 200) {
+            return yield res.json();
+        }
+        else {
+            throw new Error(yield res.text());
+        }
+    });
+    const bind = (method) => {
+        return (options) => call(method, options);
+    };
+    return { call, bind };
+};
