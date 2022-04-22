@@ -7,7 +7,7 @@ export type Endpoint = {
     schemaOut: libschema.Schema;
 }
 
-export const EndpointSchema: libschema.Schema = {
+export const EndpointSchema: libschema.Schema<Endpoint> = {
     type: 'object',
     props: {
         name: { type: 'string' },
@@ -38,7 +38,7 @@ export const createServer = (): Server => {
             method: string;
             options: any;
         }
-        const __CallSchema: libschema.Schema = {
+        const __CallSchema: libschema.Schema<__Call> = {
             type: 'object',
             props: {
                 method: { type: 'string' },

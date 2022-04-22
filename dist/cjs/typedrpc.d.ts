@@ -5,7 +5,7 @@ export declare type Endpoint = {
     schemaIn: libschema.Schema;
     schemaOut: libschema.Schema;
 };
-export declare const EndpointSchema: libschema.Schema;
+export declare const EndpointSchema: libschema.Schema<Endpoint>;
 export declare type Server = {
     call: (payload: any) => Promise<any>;
     bind: (name: string, method: (options: any) => Promise<any>, schemaIn: libschema.Schema, schemaOut: libschema.Schema) => void;
