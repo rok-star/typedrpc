@@ -1,16 +1,16 @@
 import * as libschema from 'schema';
-export declare type Endpoint = {
+export declare type Endpoint<T = any> = {
     name: string;
-    method: (options: any) => Promise<any>;
+    method: (options: any, context: T) => Promise<any>;
     schemaIn: libschema.Schema;
     schemaOut: libschema.Schema;
 };
 export declare const EndpointSchema: libschema.Schema<Endpoint>;
-export declare type Server = {
-    call: (payload: any) => Promise<any>;
-    bind: (name: string, method: (options: any) => Promise<any>, schemaIn: libschema.Schema, schemaOut: libschema.Schema) => void;
+export declare type Server<T> = {
+    call: (payload: any, context: T) => Promise<any>;
+    bind: (name: string, method: (options: any, context: T) => Promise<any>, schemaIn: libschema.Schema, schemaOut: libschema.Schema) => void;
 };
-export declare const createServer: () => Server;
+export declare const createServer: <T>() => Server<T>;
 export declare type Client = {
     call: <T = any, R = any>(method: string, options: T) => Promise<R>;
     bind: <T = any, R = any>(method: string) => (options: T) => Promise<R>;

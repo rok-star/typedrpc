@@ -25,7 +25,7 @@ const createServer = () => {
     const bind = (name, method, schemaIn, schemaOut) => {
         _endpoints.push({ name, method, schemaIn, schemaOut });
     };
-    const call = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const call = (payload, context) => __awaiter(void 0, void 0, void 0, function* () {
         libschema.assert(payload, { type: 'any' });
         const __CallSchema = {
             type: 'object',
@@ -46,7 +46,7 @@ const createServer = () => {
         const endpoint = _endpoints.find(({ name }) => name === callobj.method);
         if (endpoint) {
             try {
-                return libschema.assert(yield endpoint.method(libschema.assert(callobj.options, endpoint.schemaIn)), endpoint.schemaOut);
+                return libschema.assert(yield endpoint.method(libschema.assert(callobj.options, endpoint.schemaIn), context), endpoint.schemaOut);
             }
             catch (e) {
                 throw new Error(`failed to execute method "${callobj.method}": ${e.message}`);

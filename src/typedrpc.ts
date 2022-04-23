@@ -1,8 +1,8 @@
 import * as libschema from 'schema'
 
-export type Endpoint = {
+export type Endpoint<T = any> = {
     name: string;
-    method: (options: any) => Promise<any>;
+    method: (options: any, context: T) => Promise<any>;
     schemaIn: libschema.Schema;
     schemaOut: libschema.Schema;
 }
@@ -17,22 +17,22 @@ export const EndpointSchema: libschema.Schema<Endpoint> = {
     }
 }
 
-export type Server = {
-    call: (payload: any) => Promise<any>;
+export type Server<T> = {
+    call: (payload: any, context: T) => Promise<any>;
     bind: (
         name: string,
-        method: (options: any) => Promise<any>,
+        method: (options: any, context: T) => Promise<any>,
         schemaIn: libschema.Schema,
         schemaOut: libschema.Schema
     ) => void;
 }
 
-export const createServer = (): Server => {
-    const _endpoints: Endpoint[] = [];
-    const bind = (name: string, method: (options: any) => Promise<any>, schemaIn: libschema.Schema, schemaOut: libschema.Schema) => {
+export const createServer = <T>(): Server<T> => {
+    const _endpoints: Endpoint<T>[] = [];
+    const bind = (name: string, method: (options: any, context: T) => Promise<any>, schemaIn: libschema.Schema, schemaOut: libschema.Schema) => {
         _endpoints.push({ name, method, schemaIn, schemaOut });
     }
-    const call = async (payload: any) => {
+    const call = async (payload: any, context: T) => {
         libschema.assert(payload, { type: 'any' });
         type __Call = {
             method: string;
@@ -61,7 +61,8 @@ export const createServer = (): Server => {
                         libschema.assert(
                             callobj.options,
                             endpoint.schemaIn
-                        )
+                        ),
+                        context
                     ),
                     endpoint.schemaOut
                 );
