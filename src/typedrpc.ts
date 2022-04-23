@@ -49,7 +49,7 @@ export const createServer = <T>(): Server<T> => {
             try {
                 return JSON.parse(payload);
             } catch (e) {
-                throw new Error(`failed to serialize RPC message: ${e.message}`);
+                throw new Error(`Failed to serialize RPC message: ${e.message}`);
             }
         })()
         const callobj = libschema.assert<__Call>(json, __CallSchema);
@@ -65,10 +65,10 @@ export const createServer = <T>(): Server<T> => {
                 }
                 return ret;
             } catch (e) {
-                throw new Error(`failed to execute method "${callobj.method}": ${e.message}`);
+                throw new Error(`Failed to execute method "${callobj.method}": ${e.message}`);
             }
         } else {
-            throw new Error(`method not found "${callobj.method}"`);
+            throw new Error(`Method not found "${callobj.method}"`);
         }
     }
     return { bind, call }
