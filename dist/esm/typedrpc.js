@@ -13,8 +13,8 @@ export const EndpointSchema = {
     props: {
         name: { type: 'string' },
         method: { type: 'function' },
-        schemaIn: { type: 'object' },
-        schemaOut: { type: 'object' }
+        schemaIn: { type: 'object', optional: true },
+        schemaOut: { type: 'object', optional: true }
     }
 };
 export const createServer = () => {
@@ -43,7 +43,14 @@ export const createServer = () => {
         const endpoint = _endpoints.find(({ name }) => name === callobj.method);
         if (endpoint) {
             try {
-                return libschema.assert(yield endpoint.method(libschema.assert(callobj.options, endpoint.schemaIn), context), endpoint.schemaOut);
+                if (endpoint.schemaIn) {
+                    libschema.assert(callobj.options, endpoint.schemaIn);
+                }
+                const ret = yield endpoint.method(callobj.options, context);
+                if (endpoint.schemaOut) {
+                    libschema.assert(ret, endpoint.schemaOut);
+                }
+                return ret;
             }
             catch (e) {
                 throw new Error(`failed to execute method "${callobj.method}": ${e.message}`);

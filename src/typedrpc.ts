@@ -3,8 +3,8 @@ import * as libschema from 'schema'
 export type Endpoint<T = any> = {
     name: string;
     method: (options: any, context: T) => Promise<any>;
-    schemaIn: libschema.Schema;
-    schemaOut: libschema.Schema;
+    schemaIn?: libschema.Schema;
+    schemaOut?: libschema.Schema;
 }
 
 export const EndpointSchema: libschema.Schema<Endpoint> = {
@@ -12,8 +12,8 @@ export const EndpointSchema: libschema.Schema<Endpoint> = {
     props: {
         name: { type: 'string' },
         method: { type: 'function' },
-        schemaIn: { type: 'object' },
-        schemaOut: { type: 'object' }
+        schemaIn: { type: 'object', optional: true },
+        schemaOut: { type: 'object', optional: true }
     }
 }
 
@@ -22,14 +22,14 @@ export type Server<T> = {
     bind: (
         name: string,
         method: (options: any, context: T) => Promise<any>,
-        schemaIn: libschema.Schema,
-        schemaOut: libschema.Schema
+        schemaIn?: libschema.Schema,
+        schemaOut?: libschema.Schema
     ) => void;
 }
 
 export const createServer = <T>(): Server<T> => {
     const _endpoints: Endpoint<T>[] = [];
-    const bind = (name: string, method: (options: any, context: T) => Promise<any>, schemaIn: libschema.Schema, schemaOut: libschema.Schema) => {
+    const bind = (name: string, method: (options: any, context: T) => Promise<any>, schemaIn?: libschema.Schema, schemaOut?: libschema.Schema) => {
         _endpoints.push({ name, method, schemaIn, schemaOut });
     }
     const call = async (payload: any, context: T) => {
@@ -56,16 +56,14 @@ export const createServer = <T>(): Server<T> => {
         const endpoint = _endpoints.find(({ name }) => name === callobj.method);
         if (endpoint) {
             try {
-                return libschema.assert(
-                    await endpoint.method(
-                        libschema.assert(
-                            callobj.options,
-                            endpoint.schemaIn
-                        ),
-                        context
-                    ),
-                    endpoint.schemaOut
-                );
+                if (endpoint.schemaIn) {
+                    libschema.assert(callobj.options, endpoint.schemaIn);
+                }
+                const ret = await endpoint.method(callobj.options, context);
+                if (endpoint.schemaOut) {
+                    libschema.assert(ret, endpoint.schemaOut);
+                }
+                return ret;
             } catch (e) {
                 throw new Error(`failed to execute method "${callobj.method}": ${e.message}`);
             }
