@@ -13,14 +13,14 @@ export const EndpointSchema = {
     props: {
         name: { type: 'string' },
         method: { type: 'function' },
-        schemaIn: { type: 'object', optional: true },
-        schemaOut: { type: 'object', optional: true }
+        options: { type: 'object', optional: true },
+        result: { type: 'object', optional: true }
     }
 };
 export const createServer = () => {
     const _endpoints = [];
-    const bind = (name, method, schemaIn, schemaOut) => {
-        _endpoints.push({ name, method, schemaIn, schemaOut });
+    const bind = (name, method, options, result) => {
+        _endpoints.push({ name, method, options, result });
     };
     const call = (payload, context) => __awaiter(void 0, void 0, void 0, function* () {
         libschema.assert(payload, { type: 'any' });
@@ -43,12 +43,12 @@ export const createServer = () => {
         const endpoint = _endpoints.find(({ name }) => name === callobj.method);
         if (endpoint) {
             try {
-                if (endpoint.schemaIn) {
-                    libschema.assert(callobj.options, endpoint.schemaIn);
+                if (endpoint.options) {
+                    libschema.assert(callobj.options, endpoint.options);
                 }
                 const ret = yield endpoint.method(callobj.options, context);
-                if (endpoint.schemaOut) {
-                    libschema.assert(ret, endpoint.schemaOut);
+                if (endpoint.result) {
+                    libschema.assert(ret, endpoint.result);
                 }
                 return ret;
             }
