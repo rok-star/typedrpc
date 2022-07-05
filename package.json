@@ -14,6 +14,6 @@
         "typescript": "4.5.5"
     },
     "dependencies": {
-        "schema": "file:../schema"
+        "schema": "github:rok-star/schema#main"
     }
 }

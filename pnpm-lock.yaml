@@ -1,12 +1,12 @@
-lockfileVersion: 5.3
+lockfileVersion: 5.4
 
 specifiers:
   '@types/node': 16.11.6
-  schema: file:../schema
+  schema: github:rok-star/schema#main
   typescript: 4.5.5
 
 dependencies:
-  schema: link:../schema
+  schema: github.com/rok-star/schema/4c749f6c9f065c96a3e1ca779271aa92f00302d6
 
 devDependencies:
   '@types/node': 16.11.6
@@ -23,3 +23,9 @@ packages:
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
+
+  github.com/rok-star/schema/4c749f6c9f065c96a3e1ca779271aa92f00302d6:
+    resolution: {tarball: https://codeload.github.com/rok-star/schema/tar.gz/4c749f6c9f065c96a3e1ca779271aa92f00302d6}
+    name: schema
+    version: 0.0.1
+    dev: false
